@@ -11,7 +11,14 @@ echo "   ArenaBook: Fresh Ubuntu Server Deployment"
 echo "----------------------------------------------------"
 
 # 1. Variables (User Input)
-read -p "Enter your Domain Name (e.g., arenabook.com): " DOMAIN
+while [ -z "$DOMAIN" ]; do
+    read -p "Enter your Domain Name (e.g., arenabook.com): " DOMAIN
+    if [ -z "$DOMAIN" ]; then echo "Error: Domain name is required."; fi
+done
+
+# Remove trailing slash if exists
+DOMAIN=$(echo $DOMAIN | sed 's/\/$//')
+
 read -p "Enter Database Password for 'arenabook_user': " DB_PASS
 
 DB_NAME="arenabook"
@@ -71,12 +78,17 @@ sudo chown -R $USER:$USER $APP_DIR
 
 # Laravel Setup
 cp .env.example .env
-sed -i "s/APP_URL=http:\/\/localhost/APP_URL=https:\/\/$DOMAIN/g" .env
+sed -i "s|APP_URL=.*|APP_URL=https://$DOMAIN|g" .env
 sed -i "s/APP_ENV=local/APP_ENV=production/g" .env
 sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" .env
-sed -i "s/DB_DATABASE=laravel/DB_DATABASE=$DB_NAME/g" .env
-sed -i "s/DB_USERNAME=root/DB_USERNAME=$DB_USER/g" .env
-sed -i "s/DB_PASSWORD=/DB_PASSWORD=$DB_PASS/g" .env
+
+# Configure Database
+sed -i "s/DB_CONNECTION=sqlite/DB_CONNECTION=mysql/g" .env
+sed -i "s/# DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/g" .env
+sed -i "s/# DB_PORT=3306/DB_PORT=3306/g" .env
+sed -i "s/# DB_DATABASE=laravel/DB_DATABASE=$DB_NAME/g" .env
+sed -i "s/# DB_USERNAME=root/DB_USERNAME=$DB_USER/g" .env
+sed -i "s/# DB_PASSWORD=/DB_PASSWORD=$DB_PASS/g" .env
 
 # Run optimized setup
 composer setup
