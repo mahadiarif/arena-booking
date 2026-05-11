@@ -101,7 +101,7 @@ class SlotGeneratorService
 
     public function getDayView(Venue $venue, Carbon $date): Collection
     {
-        return Slot::with(['bookings.customer'])
+        return Slot::with(['bookings.customer', 'venue'])
             ->forVenue($venue->id)
             ->forDate($date)
             ->orderBy('start_time')
