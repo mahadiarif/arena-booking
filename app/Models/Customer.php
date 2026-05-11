@@ -25,6 +25,7 @@ class Customer extends Model
         'credit_balance',
         'total_bookings',
         'created_by',
+        'user_id',
     ];
 
     protected function casts(): array

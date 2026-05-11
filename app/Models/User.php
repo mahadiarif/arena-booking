@@ -57,6 +57,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Customer::class, 'created_by');
     }
 
+    public function customer(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Customer::class);
+    }
+
     // ── Scopes ─────────────────────────────────────────────────────────────────
 
     public function scopeActive($query): void
