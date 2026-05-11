@@ -19,7 +19,7 @@
 
 <section class="bg-slate-50 py-10">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <form action="{{ route('venues.index') }}" method="GET" class="-mt-20 mb-10 rounded-3xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/60">
+        <form action="{{ route('venues.index') }}" method="GET" class="relative z-20 -mt-20 mb-10 rounded-3xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/60">
             <div class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_220px_auto]">
                 <div class="relative">
                     <svg class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>

@@ -10,7 +10,7 @@
     $fallbackVenueImage = 'https://images.unsplash.com/photo-1459865264687-595d652de67e?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80';
 @endphp
 
-<section class="relative overflow-hidden bg-slate-950">
+<section class="relative z-20 bg-slate-950">
     <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ $heroImage }}')"></div>
     <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-900/30"></div>
     <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-50 to-transparent"></div>
@@ -37,7 +37,7 @@
             </div>
         </div>
 
-        <div class="relative z-20" x-data="{ selectedSport: '{{ request('type') }}' }">
+        <div class="relative z-30" x-data="{ selectedSport: '{{ request('type') }}' }">
             <form action="{{ route('venues.index') }}" method="GET" class="rounded-3xl border border-white/15 bg-white p-4 shadow-2xl shadow-slate-950/30">
                 <input type="hidden" name="type" :value="selectedSport">
 
