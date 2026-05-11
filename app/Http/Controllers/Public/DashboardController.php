@@ -19,8 +19,8 @@ class DashboardController extends Controller
                 'user_id' => $user->id,
                 'name'    => $user->name,
                 'email'   => $user->email,
-                'phone'   => 'N/A', // Default or fetch from user if available
-                'address' => 'N/A',
+                'phone'   => '000-' . $user->id, // Unique temporary phone
+                'address' => 'Not Provided',
             ]);
         }
 
