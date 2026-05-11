@@ -17,6 +17,7 @@ read -p "Enter Database Password for 'arenabook_user': " DB_PASS
 DB_NAME="arenabook"
 DB_USER="arenabook_user"
 APP_DIR="/var/www/html"
+REPO_URL="https://github.com/mahadiarif/arena-booking.git"
 
 echo "----------------------------------------------------"
 echo "Step 1: System Update & Essential Tools"
@@ -54,11 +55,15 @@ sudo apt install -y nodejs
 echo "----------------------------------------------------"
 echo "Step 5: Application Deployment"
 echo "----------------------------------------------------"
-# Assuming script is run inside the repo or repo is cloned to /var/www/arenabook
-if [ ! -d "$APP_DIR" ]; then
-    echo "Current directory is not $APP_DIR. Copying files..."
-    sudo mkdir -p $APP_DIR
-    sudo cp -r . $APP_DIR
+# Clone repository if APP_DIR is empty or not a git repo
+if [ ! -d "$APP_DIR/.git" ]; then
+    echo "Cloning repository from $REPO_URL..."
+    sudo rm -rf $APP_DIR/* || true
+    sudo git clone $REPO_URL $APP_DIR
+else
+    echo "Repository already exists. Pulling latest changes..."
+    cd $APP_DIR
+    sudo git pull origin main
 fi
 
 cd $APP_DIR
