@@ -44,8 +44,9 @@ echo "Step 3: Install & Configure MySQL"
 echo "----------------------------------------------------"
 sudo apt install -y mysql-server
 sudo mysql -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-sudo mysql -e "CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';"
-sudo mysql -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';"
+sudo mysql -e "CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASS';"
+sudo mysql -e "ALTER USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASS';"
+sudo mysql -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';"
 sudo mysql -e "FLUSH PRIVILEGES;"
 
 echo "----------------------------------------------------"
@@ -86,9 +87,9 @@ sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" .env
 sed -i "s/DB_CONNECTION=sqlite/DB_CONNECTION=mysql/g" .env
 sed -i "s/# DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/g" .env
 sed -i "s/# DB_PORT=3306/DB_PORT=3306/g" .env
-sed -i "s/# DB_DATABASE=laravel/DB_DATABASE=$DB_NAME/g" .env
-sed -i "s/# DB_USERNAME=root/DB_USERNAME=$DB_USER/g" .env
-sed -i "s/# DB_PASSWORD=/DB_PASSWORD=$DB_PASS/g" .env
+sed -i "s|# DB_DATABASE=laravel|DB_DATABASE=$DB_NAME|g" .env
+sed -i "s|# DB_USERNAME=root|DB_USERNAME=$DB_USER|g" .env
+sed -i "s|# DB_PASSWORD=|DB_PASSWORD=$DB_PASS|g" .env
 
 # Run optimized setup
 composer setup
