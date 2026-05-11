@@ -14,14 +14,16 @@ class DashboardController extends Controller
         $customer = $user->customer;
         
         if (!$customer) {
-            // Auto-create customer record if missing
-            $customer = \App\Models\Customer::create([
-                'user_id' => $user->id,
-                'name'    => $user->name,
-                'email'   => $user->email,
-                'phone'   => '000-' . $user->id, // Unique temporary phone
-                'address' => 'Not Provided',
-            ]);
+            // Auto-create or fetch customer record
+            $customer = \App\Models\Customer::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'name'    => $user->name,
+                    'email'   => $user->email,
+                    'phone'   => '000-' . $user->id, 
+                    'address' => 'Not Provided',
+                ]
+            );
         }
 
         $bookings = $customer->bookings()->with(['venue', 'slot'])->latest()->paginate(10);
