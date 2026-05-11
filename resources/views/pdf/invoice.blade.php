@@ -113,14 +113,24 @@ tr:nth-child(even) td { background:#f8fafc; }
 {{-- Summary --}}
 <div class="section">
   <table class="summary-table">
-    <tr><td class="label">Subtotal</td><td align="right">৳{{ number_format($booking->total_amount,2) }}</td></tr>
-    <tr><td class="label">Total Paid</td><td align="right" style="color:#16a34a;font-weight:600">৳{{ number_format($booking->paid_amount,2) }}</td></tr>
-    @if($booking->due_amount > 0)
-    <tr class="total-row"><td class="label">Total Amount</td><td align="right">৳{{ number_format($booking->total_amount,2) }}</td></tr>
-    <tr class="due-row"><td>Balance Due</td><td align="right">৳{{ number_format($booking->due_amount,2) }}</td></tr>
-    @else
-    <tr class="total-row"><td>Balance Due</td><td align="right" style="color:#16a34a">৳0.00</td></tr>
-    @endif
+    <tr>
+        <td class="label">Subtotal</td>
+        <td align="right">৳{{ number_format($booking->total_amount, 2) }}</td>
+    </tr>
+    <tr>
+        <td class="label">Total Amount</td>
+        <td align="right" style="font-weight: 700;">৳{{ number_format($booking->total_amount, 2) }}</td>
+    </tr>
+    <tr>
+        <td class="label">Amount Paid</td>
+        <td align="right" style="color:#16a34a; font-weight:600">৳{{ number_format($booking->paid_amount, 2) }}</td>
+    </tr>
+    <tr class="total-row {{ $booking->due_amount > 0 ? 'due-row' : '' }}">
+        <td>Balance Due</td>
+        <td align="right" style="{{ $booking->due_amount <= 0 ? 'color:#16a34a;' : '' }}">
+            ৳{{ number_format($booking->due_amount, 2) }}
+        </td>
+    </tr>
   </table>
 </div>
 

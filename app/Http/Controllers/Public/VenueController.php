@@ -13,6 +13,7 @@ class VenueController extends Controller
     {
         $venues = Venue::active()
             ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%"))
+            ->when($request->type, fn($q) => $q->where('type', $request->type))
             ->with(['primaryImage'])
             ->orderBy('sort_order')
             ->paginate(12);

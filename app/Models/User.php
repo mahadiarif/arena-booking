@@ -18,8 +18,8 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        // Allow users who have admin role or is_active
-        return $this->is_active && ($this->hasRole('admin') || $this->hasRole('super-admin') || $this->role === 'admin');
+        // Allow users who have any admin/staff role and are active
+        return $this->is_active && ($this->hasAnyRole(['super_admin', 'admin', 'staff']) || $this->role === 'admin');
     }
 
     protected $fillable = [

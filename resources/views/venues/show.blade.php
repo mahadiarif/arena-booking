@@ -94,11 +94,13 @@
                     }" x-init="fetchSlots()">
                         
                         <div class="flex flex-col md:flex-row gap-6 mb-8">
-                            <div class="w-full md:w-64">
-                                <label class="text-xs font-bold text-slate-400 uppercase mb-2 block">Choose Date</label>
-                                <input type="date" x-model="date" @change="fetchSlots()" 
-                                       min="{{ date('Y-m-d') }}"
-                                       class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition">
+                            <div class="w-full md:w-64" @date-selected="date = $event.detail; fetchSlots()">
+                                <x-calendar-picker 
+                                    name="date" 
+                                    :value="date('Y-m-d')" 
+                                    label="Choose Date" 
+                                    :minDate="date('Y-m-d')"
+                                />
                             </div>
                             <div class="flex-1">
                                 <label class="text-xs font-bold text-slate-400 uppercase mb-2 block">Available Slots</label>

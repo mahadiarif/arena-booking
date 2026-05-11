@@ -8,7 +8,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
 
   {{-- Today's Bookings --}}
-  <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex items-center gap-5 relative overflow-hidden">
+  <div class="bg-blue-50/30 rounded-3xl border border-blue-100 shadow-sm p-6 flex items-center gap-5 relative overflow-hidden">
     <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 shrink-0">
       <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
     </div>
@@ -21,7 +21,7 @@
   </div>
 
   {{-- Monthly Revenue --}}
-  <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex items-center gap-5 relative overflow-hidden">
+  <div class="bg-green-50/30 rounded-3xl border border-green-100 shadow-sm p-6 flex items-center gap-5 relative overflow-hidden">
     <div class="w-14 h-14 bg-green-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-200 shrink-0">
       <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
     </div>
@@ -40,7 +40,7 @@
   </div>
 
   {{-- Outstanding Due --}}
-  <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex items-center gap-5 relative overflow-hidden">
+  <div class="{{ $totalDue > 0 ? 'bg-red-50/30 border-red-100' : 'bg-slate-50/30 border-slate-100' }} rounded-3xl border shadow-sm p-6 flex items-center gap-5 relative overflow-hidden">
     <div class="w-14 h-14 {{ $totalDue > 0 ? 'bg-red-500' : 'bg-slate-200' }} rounded-2xl flex items-center justify-center shadow-lg {{ $totalDue > 0 ? 'shadow-red-200' : '' }} shrink-0">
       <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
     </div>
@@ -53,7 +53,7 @@
   </div>
 
   {{-- Customers --}}
-  <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex items-center gap-5 relative overflow-hidden">
+  <div class="bg-purple-50/30 rounded-3xl border border-purple-100 shadow-sm p-6 flex items-center gap-5 relative overflow-hidden">
     <div class="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-200 shrink-0">
       <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
     </div>
@@ -119,7 +119,7 @@
         @endphp
         <a href="{{ $bookable ? $link : '#' }}"
            class="group flex flex-col items-center p-3.5 rounded-2xl border-2 text-center transition-all duration-200
-                  {{ $bookable ? 'border-slate-100 hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 hover:shadow-md cursor-pointer' : 'cursor-default' }}
+                  {{ $bookable ? 'bg-emerald-50/40 border-emerald-100 hover:border-emerald-300 hover:bg-emerald-50 hover:-translate-y-0.5 hover:shadow-md cursor-pointer' : 'cursor-default' }}
                   {{ $isBooked ? 'border-blue-100 bg-blue-50/50' : '' }}
                   {{ $sv === 'blocked' ? 'border-slate-100 bg-slate-50 opacity-50' : '' }}">
           <span class="text-sm font-black text-slate-800 mb-1">

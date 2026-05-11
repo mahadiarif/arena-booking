@@ -9,6 +9,7 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; }
+        [x-cloak] { display: none !important; }
         .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
         .btn-3d { 
             position: relative; 
@@ -19,11 +20,24 @@
             transform: translateY(2px); 
             box-shadow: 0 2px 0 rgba(0,0,0,0.1);
         }
-        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .card-hover { 
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+            will-change: transform;
+        }
+        .card-hover:hover { 
+            transform: translateY(-8px) scale(1.01); 
+            box-shadow: 0 30px 60px -12px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3); 
+        }
     </style>
 </head>
 <body class="text-slate-800">
+
+    @if(session()->has('impersonate'))
+    <div class="bg-blue-600 text-white px-4 py-2 text-center text-xs font-black uppercase tracking-[0.2em] relative z-[101]">
+        You are currently impersonating <strong>{{ auth()->user()->name }}</strong>. 
+        <a href="{{ route('admin.impersonate.stop') }}" class="underline ml-4 hover:text-blue-200 transition">Stop Impersonating</a>
+    </div>
+    @endif
 
     {{-- Navigation --}}
     <nav class="sticky top-0 z-50 glass border-b border-slate-200">

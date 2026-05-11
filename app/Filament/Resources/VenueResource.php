@@ -29,13 +29,11 @@ class VenueResource extends Resource
 
                     Forms\Components\Select::make('type')
                         ->options([
-                            'football'  => 'Football',
-                            'cricket'   => 'Cricket',
-                            'badminton' => 'Badminton',
-                            'basketball'=> 'Basketball',
-                            'tennis'    => 'Tennis',
-                            'multi'     => 'Multi-Sport',
-                            'other'     => 'Other',
+                            'stadium'      => 'Stadium',
+                            'turf_indoor'  => 'Indoor Turf',
+                            'turf_outdoor' => 'Outdoor Turf',
+                            'vip_box'      => 'VIP Box',
+                            'hall'         => 'Hall',
                         ])->required(),
 
                     Forms\Components\TextInput::make('capacity')
@@ -43,20 +41,14 @@ class VenueResource extends Resource
 
                     Forms\Components\Textarea::make('description')
                         ->rows(3)->columnSpan(2),
-
-                    Forms\Components\TextInput::make('address')->columnSpan(2),
                 ]),
 
             Forms\Components\Section::make('Pricing & Settings')
-                ->columns(3)
+                ->columns(2)
                 ->schema([
-                    Forms\Components\TextInput::make('base_price')
-                        ->label('Base Price (৳/slot)')
-                        ->numeric()->required()->prefix('৳'),
-
                     Forms\Components\TextInput::make('hourly_rate')
-                        ->label('Hourly Rate (৳)')
-                        ->numeric()->prefix('৳'),
+                        ->label('Price per Hour (৳)')
+                        ->numeric()->required()->prefix('৳'),
 
                     Forms\Components\ColorPicker::make('color')
                         ->label('Calendar Color'),
@@ -86,14 +78,14 @@ class VenueResource extends Resource
                     ->searchable()->sortable()->weight('bold'),
 
                 Tables\Columns\BadgeColumn::make('type')
-                    ->formatStateUsing(fn($state) => ucfirst($state))
+                    ->formatStateUsing(fn($state) => ucfirst(str_replace('_', ' ', $state)))
                     ->color('primary'),
 
                 Tables\Columns\TextColumn::make('capacity')
                     ->numeric()->sortable(),
 
-                Tables\Columns\TextColumn::make('base_price')
-                    ->label('Price/Slot')
+                Tables\Columns\TextColumn::make('hourly_rate')
+                    ->label('Price/Hour')
                     ->money('BDT')->sortable(),
 
                 Tables\Columns\TextColumn::make('schedule.name')
@@ -101,19 +93,16 @@ class VenueResource extends Resource
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')->boolean(),
-
-                Tables\Columns\TextColumn::make('sort_order')
-                    ->label('Order')->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')->label('Active'),
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'football'  => 'Football',
-                        'cricket'   => 'Cricket',
-                        'badminton' => 'Badminton',
-                        'multi'     => 'Multi-Sport',
+                        'stadium'      => 'Stadium',
+                        'turf_indoor'  => 'Indoor Turf',
+                        'turf_outdoor' => 'Outdoor Turf',
+                        'vip_box'      => 'VIP Box',
+                        'hall'         => 'Hall',
                     ]),
             ])
             ->actions([

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard') — ArenaBook</title>
+    <title>@yield('title', 'Dashboard') — Metro ArenaBook</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -196,16 +196,30 @@
     </style>
     @stack('styles')
 </head>
-<body class="h-full bg-slate-50">
+<body x-data="{ mobileMenu: false }" class="h-full bg-slate-50">
+    @if(session()->has('impersonate'))
+    <div class="bg-blue-600 text-white px-4 py-2 text-center text-[10px] font-black uppercase tracking-[0.2em] relative z-[101]">
+        You are currently impersonating <strong>{{ auth()->user()->name }}</strong>. 
+        <a href="{{ route('admin.impersonate.stop') }}" class="underline ml-4 hover:text-blue-200 transition">Stop Impersonating</a>
+    </div>
+    @endif
+
+    {{-- MOBILE OVERLAY --}}
+    <div x-show="mobileMenu" x-cloak @click="mobileMenu = false" 
+         class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"></div>
 
 {{-- SIDEBAR --}}
-<aside class="fixed inset-y-0 left-0 w-64 flex flex-col z-30 bg-slate-900 border-r border-white/5">
+<aside :class="mobileMenu ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+       class="fixed inset-y-0 left-0 w-64 flex flex-col z-50 bg-slate-900 border-r border-white/5 transition-transform duration-300 ease-in-out">
     <div class="flex items-center gap-3 px-5 h-16 border-b border-white/5 flex-shrink-0">
         <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-base shadow-lg shadow-blue-900/50">⚽</div>
         <div>
-            <p class="text-white font-bold text-sm leading-none">ArenaBook</p>
+            <p class="text-white font-bold text-sm leading-none">Metro ArenaBook</p>
             <p class="text-slate-500 text-[10px] mt-0.5 uppercase tracking-wider">Booking System</p>
         </div>
+        <button @click="mobileMenu = false" class="lg:hidden ml-auto p-2 text-slate-400 hover:text-white transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
     </div>
 
     <nav class="sidebar-nav px-3 py-3 space-y-0.5">
@@ -225,11 +239,11 @@
         @endcan
 
         @can('view bookings')
-        @php $todayCount = \App\Models\Booking::today()->count(); @endphp
-        <a href="{{ route('admin.bookings.index') }}" class="nav-item {{ Route::is('admin.bookings.*') && !Route::is('admin.bookings.create') ? 'active' : '' }}">
+        @php $pendingCount = \App\Models\Booking::where('status', 'pending')->count(); @endphp
+        <a href="{{ route('admin.bookings.index') }}?status=pending" class="nav-item {{ Route::is('admin.bookings.*') && !Route::is('admin.bookings.create') ? 'active' : '' }}">
             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             Bookings
-            @if($todayCount > 0)<span class="ml-auto bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">{{ $todayCount }}</span>@endif
+            @if($pendingCount > 0)<span class="ml-auto bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">{{ $pendingCount }}</span>@endif
         </a>
 
         <a href="{{ route('admin.reviews.index') }}" class="nav-item {{ Route::is('admin.reviews.*') ? 'active' : '' }}">
@@ -276,10 +290,22 @@
             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
             Reports
         </a>
+        <a href="{{ route('admin.marketing.index') }}" class="nav-item {{ Route::is('admin.marketing.*') ? 'active' : '' }}">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+            Marketing
+        </a>
         @endcan
 
         @can('manage settings')
         <p class="px-3 pt-3 pb-1 text-[10px] font-bold text-slate-600 uppercase tracking-widest">System</p>
+        <a href="{{ route('admin.users.index') }}" class="nav-item {{ Route::is('admin.users.*') ? 'active' : '' }}">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            Users
+        </a>
+        <a href="{{ route('admin.roles.index') }}" class="nav-item {{ Route::is('admin.roles.*') ? 'active' : '' }}">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            Roles
+        </a>
         <a href="{{ route('admin.settings.index') }}" class="nav-item {{ Route::is('admin.settings.*') ? 'active' : '' }}">
             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             Settings
@@ -307,39 +333,107 @@
     </div>
 </aside>
 
-{{-- TOPBAR --}}
-<header class="fixed top-0 left-64 right-0 h-16 bg-white border-b border-slate-200 z-20 flex items-center px-6 gap-4">
-    <div class="flex-1 flex items-center gap-2 text-sm">
-        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        <span class="text-slate-300">/</span>
-        <span class="font-semibold text-slate-700 text-sm">@yield('breadcrumb', 'Dashboard')</span>
-    </div>
+{{-- MAIN WRAPPER --}}
+<div class="lg:pl-64 min-h-screen flex flex-col">
+    {{-- TOPBAR --}}
+    <header class="fixed top-0 lg:left-64 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 z-20 flex items-center px-4 lg:px-6 gap-3">
+        <button @click="mobileMenu = true" class="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="flex-1 flex items-center gap-2 text-sm truncate">
+            <svg class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span class="text-slate-300">/</span>
+            <span class="font-semibold text-slate-700 text-sm truncate">@yield('breadcrumb', 'Dashboard')</span>
+        </div>
     <span class="hidden lg:block text-xs text-slate-400">{{ now()->format('l, d M Y') }}</span>
 
-    @php $dueCount = \App\Models\Booking::whereRaw('paid_amount < total_amount')->whereNotIn('status',['cancelled','no_show','completed'])->count(); @endphp
-    <a href="{{ route('admin.bookings.index') }}" class="relative p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-        @if($dueCount > 0)<span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{{ min($dueCount, 9) }}{{ $dueCount > 9 ? '+' : '' }}</span>@endif
-    </a>
-
+    {{-- Notifications Dropdown --}}
+    @php
+        $pendingBookings = \App\Models\Booking::where('status', 'pending')->latest()->take(5)->get();
+        $dueBookings = \App\Models\Booking::whereRaw('paid_amount < total_amount')
+            ->whereNotIn('status',['cancelled','no_show','completed'])
+            ->latest()
+            ->take(5)
+            ->get();
+        $totalNotif = $pendingBookings->count() + $dueBookings->count();
+    @endphp
     <div x-data="{ open: false }" class="relative">
-        <button @click="open=!open" @click.away="open=false" class="flex items-center gap-2 px-2 py-1 rounded-xl hover:bg-slate-100 transition">
-            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[11px] font-bold text-white">{{ strtoupper(substr(auth()->user()->name,0,2)) }}</div>
-            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        <button @click="open=!open" @click.away="open=false" class="relative p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            @if($totalNotif > 0)<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>@endif
         </button>
-        <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-             class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-1 z-50 origin-top-right">
-            <div class="px-4 py-2.5 border-b border-slate-100">
-                <p class="text-sm font-semibold text-slate-800 truncate">{{ auth()->user()->name }}</p>
-                <p class="text-xs text-slate-400 truncate">{{ auth()->user()->email }}</p>
+        <div x-show="open" x-cloak x-transition:enter="transition duration-150" x-transition:enter-start="opacity-0 scale-95"
+             class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden origin-top-right">
+            <div class="px-4 py-3 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                <span class="text-xs font-black text-slate-800 uppercase tracking-widest">Notifications</span>
+                @if($totalNotif > 0)<span class="bg-red-100 text-red-600 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase">{{ $totalNotif }} New</span>@endif
             </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    Logout
-                </button>
-            </form>
+            <div class="max-h-96 overflow-y-auto divide-y divide-slate-50">
+                @forelse($pendingBookings as $b)
+                <a href="{{ route('admin.bookings.show', $b) }}" class="flex gap-3 px-4 py-3 hover:bg-blue-50/50 transition">
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-800">New Pending Booking</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Booking #{{ $b->id }} by {{ $b->customer->name }}</p>
+                    </div>
+                </a>
+                @empty @endforelse
+
+                @forelse($dueBookings as $b)
+                <a href="{{ route('admin.bookings.show', $b) }}" class="flex gap-3 px-4 py-3 hover:bg-orange-50/50 transition border-l-2 border-orange-400">
+                    <div class="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-800">Outstanding Payment</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">ID #{{ $b->id }} - Due: {{ number_format($b->total_amount - $b->paid_amount) }}</p>
+                    </div>
+                </a>
+                @empty @endforelse
+
+                @if($totalNotif == 0)
+                <div class="px-6 py-8 text-center">
+                    <svg class="w-8 h-8 text-slate-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No new notifications</p>
+                </div>
+                @endif
+            </div>
+            <a href="{{ route('admin.bookings.index') }}" class="block px-4 py-2.5 bg-slate-50 text-[10px] font-black text-center text-blue-600 uppercase tracking-widest hover:bg-slate-100 transition">View All Bookings</a>
+        </div>
+    </div>
+
+    {{-- User Profile Dropdown --}}
+    <div x-data="{ open: false }" class="relative">
+        <button @click="open=!open" @click.away="open=false" class="flex items-center gap-2.5 pl-1.5 pr-2 py-1.5 rounded-2xl hover:bg-slate-100 transition border border-transparent hover:border-slate-200 shadow-sm hover:shadow-inner group">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[11px] font-black text-white shadow-lg shadow-blue-500/20 group-hover:scale-95 transition-transform">
+                {{ strtoupper(substr(auth()->user()->name,0,2)) }}
+            </div>
+            <div class="hidden md:block text-left mr-1">
+                <p class="text-[11px] font-black text-slate-700 leading-none uppercase tracking-tight">{{ auth()->user()->name }}</p>
+                <p class="text-[9px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">{{ str_replace('_', ' ', auth()->user()->role) }}</p>
+            </div>
+            <svg class="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div x-show="open" x-cloak x-transition:enter="transition duration-150" x-transition:enter-start="opacity-0 scale-95"
+             class="absolute right-0 mt-2 w-56 bg-white rounded-3xl shadow-2xl border border-slate-100 py-2 z-50 origin-top-right overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-50 bg-slate-50/50">
+                <p class="text-xs font-black text-slate-800 truncate uppercase tracking-tight">{{ auth()->user()->name }}</p>
+                <p class="text-[10px] font-bold text-slate-400 truncate mt-0.5 tracking-tight">{{ auth()->user()->email }}</p>
+            </div>
+            
+            <div class="p-1.5">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full text-left px-4 py-3 text-[11px] font-black text-red-600 hover:bg-red-50 rounded-2xl transition flex items-center gap-3 uppercase tracking-widest">
+                        <div class="w-7 h-7 rounded-xl bg-red-100 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        </div>
+                        Log Out
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </header>
@@ -371,12 +465,13 @@
     @endif
 </div>
 
-{{-- MAIN CONTENT --}}
-<main class="ml-64 pt-16 min-h-screen bg-gray-50">
-    <div class="p-6">
-        @yield('content')
-    </div>
-</main>
+    {{-- MAIN CONTENT --}}
+    <main class="flex-1 pt-16 min-h-screen">
+        <div class="p-4 lg:p-8">
+            @yield('content')
+        </div>
+    </main>
+</div> {{-- Close MAIN WRAPPER --}}
 
 @stack('scripts')
 </body>

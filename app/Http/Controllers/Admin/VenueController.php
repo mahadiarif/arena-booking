@@ -24,7 +24,7 @@ class VenueController extends Controller
     public function index(): View
     {
         $venues = Venue::with(['schedule', 'images', 'primaryImage', 'bookings'])
-            ->withCount('bookings')
+            ->withCount(['bookings', 'slots', 'images'])
             ->orderBy('sort_order')
             ->get();
 

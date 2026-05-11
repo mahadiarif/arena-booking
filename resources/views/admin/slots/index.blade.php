@@ -19,8 +19,13 @@
       </div>
 
       {{-- Date Picker --}}
-      <input type="date" name="date" value="{{ $date->toDateString() }}" onchange="this.form.submit()"
-             class="text-sm border border-slate-200 rounded-2xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 font-semibold">
+      <div class="w-48">
+          <x-calendar-picker 
+            name="date" 
+            :value="$date->toDateString()" 
+            label=""
+          />
+      </div>
     </form>
 
     {{-- Date Navigation --}}
@@ -133,16 +138,16 @@
       $isBlocked   = $statusValue === 'blocked';
     @endphp
     <div x-data="{loading:false}"
-         class="relative bg-white rounded-3xl border-2 shadow-sm overflow-hidden transition-all duration-200 group
-           {{ $isAvailable ? 'border-slate-100 hover:border-blue-200 hover:shadow-lg hover:-translate-y-0.5' : '' }}
-           {{ $isBooked    ? 'border-blue-100 bg-blue-50/30' : '' }}
-           {{ $isBlocked   ? 'border-slate-100 opacity-50' : '' }}">
+         class="relative rounded-3xl border-2 shadow-sm overflow-hidden transition-all duration-200 group
+           {{ $isAvailable ? 'bg-emerald-50/40 border-emerald-100 hover:border-emerald-300 hover:shadow-lg hover:-translate-y-0.5' : '' }}
+           {{ $isBooked    ? 'bg-blue-50/40 border-blue-100' : '' }}
+           {{ $isBlocked   ? 'bg-slate-50 border-slate-200 opacity-60' : '' }}">
 
       {{-- Status Top Bar --}}
       <div class="h-1.5 w-full
-        {{ $isAvailable ? 'bg-green-400' : '' }}
+        {{ $isAvailable ? 'bg-emerald-400' : '' }}
         {{ $isBooked    ? 'bg-blue-500'  : '' }}
-        {{ $isBlocked   ? 'bg-slate-300' : '' }}"></div>
+        {{ $isBlocked   ? 'bg-slate-400' : '' }}"></div>
 
       <div class="p-5">
         {{-- Time --}}

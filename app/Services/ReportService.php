@@ -9,6 +9,7 @@ use App\Models\Venue;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportService
 {
@@ -116,26 +117,28 @@ class ReportService
     /**
      * Export report data to Excel (requires maatwebsite/excel).
      */
-    public function exportToExcel(string $type, Carbon $from, Carbon $to, string $filename): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    public function exportToExcel(string $type, Carbon $from, Carbon $to, string $filename, ?int $venueId = null): StreamedResponse
     {
         // Requires: composer require maatwebsite/excel
         // Placeholder — implement with specific Export classes once package is installed
         $data = $type === 'utilization'
-            ? $this->getUtilizationReport($from, $to)
-            : $this->getRevenueReport($from, $to);
+            ? $this->getUtilizationReport($from, $to, $venueId)
+            : $this->getRevenueReport($from, $to, $venueId);
 
-        // For now, return a CSV download as fallback
-        $csv     = tmpfile();
-        $path    = stream_get_meta_data($csv)['uri'];
         $headers = array_keys($data->first() ?? []);
 
-        $handle = fopen($path, 'w');
-        fputcsv($handle, $headers);
-        foreach ($data as $row) {
-            fputcsv($handle, array_values($row));
-        }
-        fclose($handle);
+        return response()->streamDownload(function () use ($headers, $data) {
+            $output = fopen('php://output', 'w');
 
-        return response()->download($path, $filename . '.csv', ['Content-Type' => 'text/csv']);
+            if ($headers !== []) {
+                fputcsv($output, $headers);
+            }
+
+            foreach ($data as $row) {
+                fputcsv($output, array_values($row));
+            }
+
+            fclose($output);
+        }, $filename . '.csv', ['Content-Type' => 'text/csv']);
     }
 }

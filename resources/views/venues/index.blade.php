@@ -1,68 +1,99 @@
 @extends('layouts.app')
 
-@section('title', 'Browse All Turfs')
+@section('title', 'Browse Turfs')
 
 @section('content')
-<div class="bg-slate-50 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {{-- Search & Filters --}}
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-12">
-            <form action="{{ route('venues.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1 relative">
-                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or location..." 
-                           class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition font-medium">
+@php
+    $fallbackVenueImage = 'https://images.unsplash.com/photo-1459865264687-595d652de67e?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80';
+@endphp
+
+<section class="bg-slate-950">
+    <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div class="max-w-3xl">
+            <p class="text-[11px] font-black uppercase tracking-[0.24em] text-blue-300">Browse Turfs</p>
+            <h1 class="mt-2 text-4xl font-black tracking-tight text-white md:text-5xl">Find the right venue for your next match</h1>
+            <p class="mt-4 text-base leading-7 text-slate-300">Filter active venues by sport type, compare capacity and pricing, then jump straight into available slots.</p>
+        </div>
+    </div>
+</section>
+
+<section class="bg-slate-50 py-10">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <form action="{{ route('venues.index') }}" method="GET" class="-mt-20 mb-10 rounded-3xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/60">
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_220px_auto]">
+                <div class="relative">
+                    <svg class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by venue name" class="h-12 w-full rounded-3xl border border-slate-200 bg-white pl-12 pr-4 text-sm font-semibold text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
                 </div>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-blue-100 transition btn-3d">Apply Filter</button>
-            </form>
+
+                <select name="type" class="h-12 rounded-3xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                    <option value="">All venue types</option>
+                    <option value="stadium" {{ request('type') == 'stadium' ? 'selected' : '' }}>Stadium</option>
+                    <option value="turf_indoor" {{ request('type') == 'turf_indoor' ? 'selected' : '' }}>Indoor Turf</option>
+                    <option value="turf_outdoor" {{ request('type') == 'turf_outdoor' ? 'selected' : '' }}>Outdoor Turf</option>
+                    <option value="vip_box" {{ request('type') == 'vip_box' ? 'selected' : '' }}>VIP Box</option>
+                    <option value="hall" {{ request('type') == 'hall' ? 'selected' : '' }}>Hall</option>
+                </select>
+
+                <input type="hidden" name="date" value="{{ request('date') }}">
+
+                <button type="submit" class="inline-flex h-12 items-center justify-center rounded-3xl bg-blue-600 px-6 text-xs font-black uppercase tracking-widest text-white transition hover:bg-blue-700">Apply Filter</button>
+            </div>
+        </form>
+
+        <div class="mb-5 flex items-center justify-between">
+            <p class="text-sm font-semibold text-slate-500">{{ $venues->total() }} venues found</p>
+            @if(request()->hasAny(['search', 'type']))
+                <a href="{{ route('venues.index') }}" class="text-xs font-black uppercase tracking-widest text-blue-600 hover:text-blue-700">Clear filters</a>
+            @endif
         </div>
 
-        {{-- Venue Grid --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @forelse($venues as $venue)
-            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden card-hover group">
-                <div class="relative h-56">
-                    <img src="{{ $venue->primaryImage ? asset('storage/' . $venue->primaryImage->path) : 'https://images.unsplash.com/photo-1459865264687-595d652de67e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }}" 
-                         alt="{{ $venue->name }}" 
-                         class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                    <div class="absolute top-4 left-4">
-                        <span class="bg-blue-600/90 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                            {{ $venue->type ?? 'Multi-purpose' }}
-                        </span>
+                <article class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+                    <div class="relative h-52 overflow-hidden bg-slate-100">
+                        <img src="{{ $venue->primaryImage ? asset('storage/' . $venue->primaryImage->path) : $fallbackVenueImage }}"
+                             alt="{{ $venue->name }}"
+                             class="h-full w-full object-cover transition duration-500 hover:scale-105">
+                        <span class="absolute left-3 top-3 rounded-2xl bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700 shadow-sm backdrop-blur">{{ $venue->getTypeLabel() }}</span>
                     </div>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-lg font-bold text-slate-800 mb-1">{{ $venue->name }}</h3>
-                    <div class="flex items-center gap-1 text-slate-400 text-xs mb-4">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        <span>{{ $venue->location }}</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                        <div class="flex flex-col">
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Starts From</span>
-                            <span class="text-lg font-bold text-blue-600">৳{{ number_format($venue->base_price, 0) }}<span class="text-[10px] text-slate-400 font-normal">/hr</span></span>
+
+                    <div class="p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <h2 class="truncate text-lg font-black text-slate-900">{{ $venue->name }}</h2>
+                                <p class="mt-1 text-xs font-semibold text-slate-500">{{ number_format($venue->capacity) }} capacity</p>
+                            </div>
+                            <div class="shrink-0 text-right">
+                                <p class="text-sm font-black text-blue-600">BDT {{ number_format($venue->hourly_rate, 0) }}</p>
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">per hour</p>
+                            </div>
                         </div>
-                        <a href="{{ route('venues.show', $venue) }}" class="bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 px-5 py-2.5 rounded-xl text-sm font-bold transition">View Details</a>
+
+                        <p class="mt-3 line-clamp-2 min-h-[2.5rem] text-sm leading-5 text-slate-500">{{ $venue->description ?: 'Ready for fast booking with real-time slot availability.' }}</p>
+
+                        <div class="mt-4 flex gap-2">
+                            <a href="{{ route('venues.show', $venue) }}" class="inline-flex h-10 flex-1 items-center justify-center rounded-3xl bg-slate-900 text-xs font-black uppercase tracking-widest text-white transition hover:bg-blue-600">View Details</a>
+                            <a href="{{ route('venues.show', $venue) }}#booking-section" class="inline-flex h-10 flex-1 items-center justify-center rounded-3xl border border-slate-200 bg-white text-xs font-black uppercase tracking-widest text-slate-700 transition hover:bg-slate-50">Slots</a>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </article>
             @empty
-            <div class="col-span-full py-20 text-center">
-                <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="col-span-full rounded-3xl border-2 border-dashed border-slate-200 bg-white p-12 text-center">
+                    <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-50">
+                        <svg class="h-7 w-7 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-800">No turfs found</h3>
+                    <p class="mt-1 text-sm text-slate-500">Try a different venue name or type.</p>
                 </div>
-                <h3 class="text-xl font-bold text-slate-700 mb-2">No turfs found</h3>
-                <p class="text-slate-500">Try adjusting your search criteria.</p>
-            </div>
             @endforelse
         </div>
 
         @if($venues->hasPages())
-        <div class="mt-12">
-            {{ $venues->links() }}
-        </div>
+            <div class="mt-10">
+                {{ $venues->links() }}
+            </div>
         @endif
     </div>
-</div>
+</section>
 @endsection

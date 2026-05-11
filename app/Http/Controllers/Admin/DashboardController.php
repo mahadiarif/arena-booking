@@ -49,15 +49,17 @@ class DashboardController extends Controller
                                          ->whereMonth('created_at', now()->month)
                                          ->count();
 
-        // Today's slot stats
-        $todaySlotsTotal     = Slot::whereDate('date', today())->count();
-        $todaySlotsAvailable = Slot::whereDate('date', today())->where('status', 'available')->count();
-        $todaySlotsBooked    = Slot::whereDate('date', today())->where('status', 'booked')->count();
-
         // ── Slot Grid (venue-filtered) ─────────────────────────────────────────
         $venueId = $request->filled('venue_id')
             ? (int) $request->venue_id
             : Venue::active()->orderBy('sort_order')->value('id');
+
+        // Today's slot stats (filtered by venue if selected, otherwise total)
+        $slotsQuery = Slot::whereDate('date', today())->where('venue_id', $venueId);
+
+        $todaySlotsTotal     = (clone $slotsQuery)->count();
+        $todaySlotsAvailable = (clone $slotsQuery)->where('status', 'available')->count();
+        $todaySlotsBooked    = (clone $slotsQuery)->where('status', 'booked')->count();
 
         $dailyView = $this->calendarService->getDailyView(now(), $venueId);
 

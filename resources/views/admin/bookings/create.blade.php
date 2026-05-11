@@ -6,8 +6,11 @@
   x-data="{
     customerId:null, customerName:'', customerPhone:'', customerCredit:0,
     customerSearch:'', customerResults:[], showDrop:false,
-    venueId:'', slotId:'', slots:[], loadingSlots:false,
-    totalAmount:0, hourlyRate:0,
+    venueId:'{{ $slot ? $slot->venue_id : '' }}', 
+    slotId:'{{ $slot ? $slot->id : '' }}', 
+    slots:[], loadingSlots:false,
+    totalAmount:{{ $slot ? $slot->venue->price ?? 0 : 0 }}, 
+    hourlyRate:{{ $slot ? $slot->venue->hourly_rate ?? 0 : 0 }},
     collectPayment:false, payMethod:'cash', payAmount:0,
     isRecurring:false, recurType:'weekly', endType:'on_date',
     participants:[],
