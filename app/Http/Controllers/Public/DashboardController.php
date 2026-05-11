@@ -14,24 +14,32 @@ class DashboardController extends Controller
         $customer = $user->customer;
         
         if (!$customer) {
-            // Check if a trashed customer exists with this user_id
-            $customer = \App\Models\Customer::withTrashed()->where('user_id', $user->id)->first();
-            
+            // Try to find the customer by user_id or email (including trashed ones)
+            $customer = \App\Models\Customer::withTrashed()
+                ->where('user_id', $user->id)
+                ->orWhere('email', $user->email)
+                ->first();
+
             if ($customer) {
+                // If it was deleted, restore it
                 if ($customer->trashed()) {
                     $customer->restore();
                 }
+                
+                // Ensure user_id is linked if it wasn't
+                if (!$customer->user_id) {
+                    $customer->update(['user_id' => $user->id]);
+                }
             } else {
-                // Auto-create or fetch customer record
-                $customer = \App\Models\Customer::updateOrCreate(
-                    ['email' => $user->email], // Fallback to email if user_id link was broken
-                    [
-                        'user_id' => $user->id,
-                        'name'    => $user->name,
-                        'phone'   => '000-' . $user->id, 
-                        'address' => 'Not Provided',
-                    ]
-                );
+                // Create new customer only if absolutely not found
+                // We use a unique temporary phone to avoid collisions
+                $customer = \App\Models\Customer::create([
+                    'user_id' => $user->id,
+                    'name'    => $user->name,
+                    'email'   => $user->email,
+                    'phone'   => 'TEMP-' . $user->id . '-' . time(), 
+                    'address' => 'Not Provided',
+                ]);
             }
         }
 

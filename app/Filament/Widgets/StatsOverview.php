@@ -30,6 +30,14 @@ class StatsOverview extends BaseWidget
             fn($d) => (float) Payment::whereDate('paid_at', now()->subDays($d))->sum('amount')
         )->values()->toArray();
 
+        $bookingChart = collect(range(6, 0))->map(
+            fn($d) => (int) Booking::whereDate('created_at', now()->subDays($d))->count()
+        )->values()->toArray();
+
+        $customerChart = collect(range(6, 0))->map(
+            fn($d) => (int) Customer::whereDate('created_at', '<=', now()->subDays($d))->count()
+        )->values()->toArray();
+
         return [
             Stat::make("Today's Bookings", $todayBookings)
                 ->description($availableSlots . ' slots still available')
@@ -45,6 +53,7 @@ class StatsOverview extends BaseWidget
             Stat::make('Pending Bookings', $pendingBookings)
                 ->description('Awaiting confirmation')
                 ->descriptionIcon('heroicon-m-clock')
+                ->chart($bookingChart)
                 ->color($pendingBookings > 0 ? 'warning' : 'success'),
 
             Stat::make('Outstanding Due', '৳ ' . number_format($totalDue, 0))
@@ -55,6 +64,7 @@ class StatsOverview extends BaseWidget
             Stat::make('Total Customers', number_format($totalCustomers))
                 ->description('Registered customers')
                 ->descriptionIcon('heroicon-m-users')
+                ->chart($customerChart)
                 ->color('info'),
         ];
     }

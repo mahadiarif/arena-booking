@@ -29,8 +29,12 @@ class RevenueChart extends ChartWidget
                 [
                     'label' => 'Revenue (৳)',
                     'data' => $data->values()->toArray(),
-                    'backgroundColor' => '#3b82f6',
-                    'borderColor' => '#2563eb',
+                    'fill' => 'start',
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
+                    'borderColor' => '#3b82f6',
+                    'pointBackgroundColor' => '#3b82f6',
+                    'pointBorderColor' => '#fff',
+                    'pointRadius' => 5,
                 ],
             ],
             'labels' => $data->keys()->toArray(),
@@ -39,6 +43,29 @@ class RevenueChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar';
+        return 'line';
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'y' => [
+                    'grid' => [
+                        'display' => false,
+                    ],
+                ],
+                'x' => [
+                    'grid' => [
+                        'display' => false,
+                    ],
+                ],
+            ],
+            'elements' => [
+                'line' => [
+                    'tension' => 0.4,
+                ],
+            ],
+        ];
     }
 }
