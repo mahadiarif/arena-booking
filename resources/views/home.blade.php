@@ -133,18 +133,19 @@
         </div>
 
         <div x-data="{ activeImg: null }">
-            <div class="columns-1 gap-4 sm:columns-2 lg:columns-3">
+            <div class="grid auto-rows-[160px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             @forelse($galleryImages as $image)
                 @php
                     $imageSrc = str_starts_with($image->path, 'images/') ? asset($image->path) : asset('storage/' . $image->path);
-                    $heightClass = match ($loop->index % 6) {
-                        0 => 'h-[420px]',
-                        1, 4 => 'h-[280px]',
-                        2 => 'h-[360px]',
-                        default => 'h-[320px]',
+                    $tileClass = match ($loop->index % 8) {
+                        0 => 'sm:col-span-2 sm:row-span-2',
+                        3 => 'lg:col-span-2',
+                        5 => 'sm:row-span-2',
+                        6 => 'sm:col-span-2',
+                        default => '',
                     };
                 @endphp
-                <button type="button" class="group relative mb-4 block w-full break-inside-avoid overflow-hidden rounded-3xl bg-slate-100 shadow-sm ring-1 ring-slate-200/70 transition hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-300/50 {{ $heightClass }}" @click="activeImg = {src: '{{ $imageSrc }}', title: '{{ $image->title }}', desc: '{{ $image->description }}'}">
+                <button type="button" class="group relative min-h-[220px] overflow-hidden rounded-3xl bg-slate-100 shadow-sm ring-1 ring-slate-200/70 transition hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-300/50 {{ $tileClass }}" @click="activeImg = {src: '{{ $imageSrc }}', title: '{{ $image->title }}', desc: '{{ $image->description }}'}">
                     <img src="{{ $imageSrc }}" alt="{{ $image->title }}" onerror="this.src='https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80'" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
                     <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/10 to-transparent opacity-80 transition group-hover:opacity-100"></div>
                     <div class="absolute inset-x-0 bottom-0 p-5 text-left">
@@ -162,7 +163,7 @@
                     ['https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=800&q=80', 'Team Play'],
                     ['https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&w=800&q=80', 'Training Hour'],
                 ] as $index => [$src, $title])
-                    <button type="button" class="group relative mb-4 block h-[{{ $index % 2 === 0 ? '380' : '280' }}px] w-full break-inside-avoid overflow-hidden rounded-3xl bg-slate-100 shadow-sm ring-1 ring-slate-200/70 transition hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-300/50" @click="activeImg = {src: '{{ $src }}', title: '{{ $title }}', desc: ''}">
+                    <button type="button" class="group relative min-h-[220px] overflow-hidden rounded-3xl bg-slate-100 shadow-sm ring-1 ring-slate-200/70 transition hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-300/50 {{ $index === 0 ? 'sm:col-span-2 sm:row-span-2' : '' }}" @click="activeImg = {src: '{{ $src }}', title: '{{ $title }}', desc: ''}">
                         <img src="{{ $src }}" alt="{{ $title }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/10 to-transparent"></div>
                         <span class="absolute inset-x-0 bottom-0 p-5 text-left text-lg font-black text-white">{{ $title }}</span>

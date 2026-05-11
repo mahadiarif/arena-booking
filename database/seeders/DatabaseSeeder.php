@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             DefaultScheduleSeeder::class,
             VenueSeeder::class,
+            GalleryImageSeeder::class,
             CustomerSeeder::class,
             BookingSeeder::class,
         ]);
